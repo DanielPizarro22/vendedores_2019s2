@@ -1,0 +1,62 @@
+import Clientes.*
+import Geografia.*
+import Certificaciones.*
+import Vendedores.*
+
+
+test "Clientes" {
+
+
+const clienteIns = new ClienteInseguro()
+const clienteDet = new ClienteDetallista()
+const clienteHum = new ClienteHumanista()
+
+const santaFe = new Provincia(poblacion = 545606)
+const cordoba = new Provincia(poblacion = 1391000)
+const entreRios = new Provincia(poblacion = 1308000)	
+const buenosAires = new Provincia(poblacion = 2890000)
+const chivilcoy = new Ciudad(provinciaEnDondeEsta = buenosAires)
+const bragado = new Ciudad(provinciaEnDondeEsta = buenosAires)
+const pergamino = new Ciudad(provinciaEnDondeEsta = buenosAires)
+
+const vendedorFijo = new VendedorFijo(ciudadDondeVive = buenosAires)
+vendedorFijo.certificaciones([new MarketinYVentas(), new GestionDeVentas()])
+
+const viajante = new Viajante()
+viajante.provinciasHabilitadas([santaFe, cordoba,entreRios])
+viajante.certificaciones([new MarketinYVentas(), new VentaAmbulanteDeAlimentos(),new CertificadosDeElectrodomesticos()])
+
+const comercioCorresponsal = new ComercioCorresponsal()
+comercioCorresponsal.sucursales([bragado,chivilcoy,pergamino, buenosAires])
+comercioCorresponsal.certificaciones([new MarketinYVentas(), new VentaAmbulanteDeAlimentos(), new GestionDeVentas()])
+
+
+
+/* Cliente insatisfecho */
+
+	 /* VENDEDOR FIJO NO ES VERSATIL, POR QUE POSEE 2 CERTIFICACIONES, POR ESO NO PUEDE SER ATENDIDO POR EL CLIENTE
+	  * 	INSATISFECHO
+	  * EN CAMBIO LOS DEMAS SI SON VERSATILES Y FIRMES
+	  */
+	assert.notThat(clienteIns.puedeSerAtentidoPor(vendedorFijo))
+	assert.that(clienteIns.puedeSerAtentidoPor(viajante))
+	assert.that(clienteIns.puedeSerAtentidoPor(comercioCorresponsal))
+	
+/* Cliente detallista */
+/* NINGUNO PUEDE SER ATENDIDO POR LOS VENDEDORES  */
+	assert.notThat(clienteDet.puedeSerAtentidoPor(vendedorFijo))
+	assert.notThat(clienteDet.puedeSerAtentidoPor(viajante))
+	assert.notThat(clienteDet.puedeSerAtentidoPor(comercioCorresponsal))
+	
+	/* PERO POR EJEMPLO SI AGREGAMOS UN CERTIFICADO QUE SEA PRODUCTO AHI SI PODRIA */
+	
+	viajante.certificaciones([new VentaAmbulanteDeAlimentos(),new CertificadosDeElectrodomesticos(),new CertificadosDeElectrodomesticos()])
+	assert.that(clienteDet.puedeSerAtentidoPor(viajante))
+	
+/* Cliente humanista  */
+
+ 	/* PUEDE SER ATENTIDO POR TODOS MENOS POR EL CORRESPONSAL QUE NO ES UNA PERSONA FISICA */
+	assert.that(clienteHum.puedeSerAtentidoPor(vendedorFijo))
+	assert.that(clienteHum.puedeSerAtentidoPor(viajante))
+	assert.notThat(clienteHum.puedeSerAtentidoPor(comercioCorresponsal))
+}

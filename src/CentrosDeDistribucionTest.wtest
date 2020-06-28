@@ -1,0 +1,59 @@
+import Vendedores.*
+import CentrosDeDistribucion.*
+import Geografia.*
+import Certificaciones.*
+
+test "testX" {
+
+const santaFe = new Provincia(poblacion = 545606)
+const cordoba = new Provincia(poblacion = 1391000)
+const entreRios = new Provincia(poblacion = 1308000)	
+const buenosAires = new Provincia(poblacion = 2890000)
+const chivilcoy = new Ciudad(provinciaEnDondeEsta = buenosAires)
+const bragado = new Ciudad(provinciaEnDondeEsta = buenosAires)
+const pergamino = new Ciudad(provinciaEnDondeEsta = buenosAires)
+
+const vendedorFijo = new VendedorFijo(ciudadDondeVive = buenosAires)
+vendedorFijo.certificaciones([new MarketinYVentas(), new GestionDeVentas()])
+
+const viajante = new Viajante()
+viajante.provinciasHabilitadas([santaFe, cordoba,entreRios])
+viajante.certificaciones([new MarketinYVentas(), new VentaAmbulanteDeAlimentos(),new CertificadosDeElectrodomesticos()])
+
+const comercioCorresponsal = new ComercioCorresponsal()
+comercioCorresponsal.sucursales([bragado,chivilcoy,pergamino, buenosAires])
+comercioCorresponsal.certificaciones([new MarketinYVentas(), new VentaAmbulanteDeAlimentos(), new GestionDeVentas()])
+
+
+/* VENDEDOR ESTRELLA */
+
+const centro = new CentroDeDistribucion(ciudadDeUbicacion= buenosAires)
+centro.agregarVendedor(vendedorFijo)
+centro.agregarVendedor(viajante)
+centro.agregarVendedor(comercioCorresponsal)
+
+assert.equals(comercioCorresponsal,centro.vendedorEstrella())
+
+/* PUEDE CUBRIR UNA CIUDAD */
+
+assert.that(centro.puedeCubrir(buenosAires))
+
+/* TODOS LOS  VENDEDORES SON GENERICOS */
+assert.equals(#{vendedorFijo,viajante,comercioCorresponsal},centro.vendedoresGenericosRegistrados())
+
+/* NO ES ROBUSTO POR QUE VENDEDOR FIJO NO ES FIRME, POR ENDE NO CUMPLE LAS CONDICIONES NECESARIAS */
+assert.notThat(centro.esRobusto())
+
+
+/* VENDEDORES CON AFINIDAD */
+
+
+/* TIENE AFINIDAD, PUEDE TRABAJAR EN LA CIUDAD QUE ESTA EN EL CENTRO */
+assert.that(vendedorFijo.tieneAfinidad(centro))
+
+/*NO TIENE AFINIDAD, POR QUE NO TRABAJA EN BUENOS AIRES */
+assert.notThat(viajante.tieneAfinidad(centro))
+
+/* PUEDE TRABAJAR, HAY AL MENOS UNA CIUDAD QUE NO PUEDE CUBRIR*/
+assert.that(comercioCorresponsal.tieneAfinidad(centro))
+}

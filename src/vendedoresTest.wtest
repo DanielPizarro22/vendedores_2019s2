@@ -1,0 +1,124 @@
+import Vendedores.*
+import Geografia.*
+import Certificaciones.*
+
+test "VENDEDORES"{
+	
+
+	/* Vendedores influyentes */
+
+	/* PROVINCIAS */
+	
+	const buenosAires = new Provincia(poblacion = 2890000)
+	const santaFe = new Provincia(poblacion = 545606)
+	const cordoba = new Provincia(poblacion = 1391000)
+	const entreRios = new Provincia(poblacion = 1308000 )
+	
+	/* CIUDADES */
+	const chivilcoy = new Ciudad(provinciaEnDondeEsta = buenosAires)
+	const bragado = new Ciudad(provinciaEnDondeEsta = buenosAires)
+	const lobos = new Ciudad(provinciaEnDondeEsta = buenosAires)
+	const pergamino = new Ciudad(provinciaEnDondeEsta = buenosAires)
+	const zarate = new Ciudad(provinciaEnDondeEsta = buenosAires)
+	const amstrong = new Ciudad(provinciaEnDondeEsta = santaFe) 
+	
+	
+	/* EJEMPLO 1 */
+	const comercio1 = new ComercioCorresponsal()
+	comercio1.sucursales([chivilcoy, bragado,lobos,pergamino,zarate])
+	assert.that(comercio1.esVendedorInfluyente())
+	
+	/* EJEMPLO 2 */
+	const rosario = new Ciudad(provinciaEnDondeEsta = santaFe)
+	const rafaela = new Ciudad(provinciaEnDondeEsta = santaFe)
+	const sanFrancisco = new Ciudad(provinciaEnDondeEsta = cordoba)
+	const diamante = new Ciudad(provinciaEnDondeEsta = entreRios)
+	
+	const comercio2 = new ComercioCorresponsal()
+	comercio2.sucursales([rosario,rafaela,sanFrancisco,diamante])
+	
+	assert.that(comercio2.esVendedorInfluyente())
+	
+	/* EJEMPLO 3 */	
+	const comercio3 = new ComercioCorresponsal()
+	comercio3.sucursales([rosario,rafaela,amstrong,diamante])
+	
+	assert.notThat(comercio3.esVendedorInfluyente())
+	
+	
+	
+	/* ES VERSATIL, ES FIRME, DADA UNA CIUDAD */
+	
+	
+const vendedorFijo = new VendedorFijo(ciudadDondeVive = buenosAires)
+vendedorFijo.certificaciones([new MarketinYVentas(), new GestionDeVentas()])
+
+
+const viajante = new Viajante()
+viajante.provinciasHabilitadas([santaFe, cordoba,entreRios])
+viajante.certificaciones([new MarketinYVentas(), new VentaAmbulanteDeAlimentos(),new CertificadosDeElectrodomesticos()])
+
+
+const comercioCorresponsal = new ComercioCorresponsal()
+comercioCorresponsal.sucursales([bragado,chivilcoy,pergamino])
+comercioCorresponsal.certificaciones([new MarketinYVentas(), new VentaAmbulanteDeAlimentos(), new GestionDeVentas()])
+
+
+//VENDEDOR FIJO
+/* Puede trabajar en buenos aires */
+
+	assert.that(vendedorFijo.puedeTrabajarEn(buenosAires))
+	
+/* No puede trabajar en santa fe */	
+
+	assert.notThat(vendedorFijo.puedeTrabajarEn(santaFe))
+	
+
+	/* No es versátil, no posee productos y solo tiene 2 certificaciones*/
+	assert.notThat(vendedorFijo.esVersatil())
+	
+	
+	/* No es Firme, la cantidad De puntos es 28 */
+	assert.notThat(vendedorFijo.esFirme())
+	assert.equals(28, vendedorFijo.puntajeTotalDeCertificaciones())
+	
+	
+	
+
+//VENDEDOR VIAJANTE
+/* Puede trabajar en cordoba */
+
+	assert.that(viajante.puedeTrabajarEn(cordoba))
+
+/* No puede trabajar en Buenos Aires */
+	assert.notThat(viajante.puedeTrabajarEn(buenosAires))
+	
+	/* Es versátil, posee un producto y otro que no es  */
+	
+	assert.that(viajante.esVersatil())
+	
+	/* Es Firme , su puntaje llega a 38*/
+		assert.that(viajante.esFirme())
+		assert.equals(38,viajante.puntajeTotalDeCertificaciones())
+	
+	
+//VENDEDOR CORRESPONSAL
+
+/* Puede trabajar en bragado */
+	assert.that(comercioCorresponsal.puedeTrabajarEn(bragado))
+	
+/* No puedeTrabajar en diamante */
+	assert.notThat(comercioCorresponsal.puedeTrabajarEn(diamante))
+	
+	/* Es versátil posee productos y no productos */
+	
+	assert.that(comercioCorresponsal.esVersatil())
+	
+	/* Es firme, su puntaje llega a 43*/
+	
+	assert.that(comercioCorresponsal.esFirme())
+	assert.equals(43,comercioCorresponsal.puntajeTotalDeCertificaciones())
+
+}
+
+
